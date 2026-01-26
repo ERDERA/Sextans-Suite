@@ -9,16 +9,16 @@ export COMPOSE_DOCKER_CLI_BUILD=0
 
 
 function ctrl_c() {
-        docker-compose -f "$CWD/metadata/docker-compose-${P}.yml" down
-        docker-compose -f "$CWD/bootstrap/docker-compose-${P}.yml" down
-        docker-compose rm -f "$CWD/metadata/docker-compose-${P}.yml" -s
-        docker-compose rm -f "$CWD/bootstrap/docker-compose-${P}.yml" -s
+        docker compose -f "$CWD/metadata/docker-compose-${P}.yml" down
+        docker compose -f "$CWD/bootstrap/docker-compose-${P}.yml" down
+        docker compose rm -f "$CWD/metadata/docker-compose-${P}.yml" -s
+        docker compose rm -f "$CWD/bootstrap/docker-compose-${P}.yml" -s
         docker network rm bootstrap_default bootstrap_graphdb_net
         docker rmi -f bootstrap_graph_db_repo_manager:latest
 
         rm "${CWD}/metadata/docker-compose-${P}.yml"
         rm "${CWD}/bootstrap/docker-compose-${P}.yml"
-        rm "${CWD}/metadata/fdp/application-${P}.yml"
+        rm "${CWD}/config/fdp/application-${P}.yml"
 
         exit 2
 }
@@ -86,8 +86,10 @@ echo ""
 cd bootstrap
 cp docker-compose-template.yml "docker-compose-${P}.yml"
 sed -i'' -e "s/{PREFIX}/${P}/" "docker-compose-${P}.yml"
+docker compose -f "docker-compose-${P}.yml" down
+sleep 5
 
-docker-compose -f "docker-compose-${P}.yml" up --build -d
+docker compose -f "docker-compose-${P}.yml" up --build -d
 sleep 120
 
 echo ""
@@ -107,30 +109,32 @@ sed -i'' -e "s/{PREFIX}/$P/" "./fdp/application-${P}.yml"
 sed -i'' -e "s/{FDP_PORT}/$FDP_PORT/" "./fdp/application-${P}.yml"
 sed -i'' -e "s%{GUID}%$uri%" "./fdp/application-${P}.yml"
 
+docker compose -f "docker-compose-${P}.yml" down
+sleep 5
 
-docker-compose -f "docker-compose-${P}.yml" up --build -d
+docker compose -f "docker-compose-${P}.yml" up --build -d
 
 
 sleep 50
 
 echo ""
-echo -e "${GREEN}Creating a production server folder in ${NC} ./${P}-ready-to-go/"
+echo -e "${GREEN}Creating a production server folder in ${NC} ./${P}-Sextans-Sight/"
 echo ""
 
 cd ..
-cp -r ./FAIR-ready-to-go ./${P}-ready-to-go
-cp ./${P}-ready-to-go/docker-compose-template.yml "./${P}-ready-to-go/docker-compose-${P}.yml"
-rm ./${P}-ready-to-go/docker-compose-template.yml
-cp ./${P}-ready-to-go/fdp/application-template.yml "./${P}-ready-to-go/fdp/application-${P}.yml"
-rm ./${P}-ready-to-go/fdp/application-template.yml
-cp ./${P}-ready-to-go/.env_template "./${P}-ready-to-go/.env"
-sed -i'' -e "s/{PREFIX}/${P}/" "./${P}-ready-to-go/docker-compose-${P}.yml"
-sed -i'' -e "s/{FDP_PORT}/${FDP_PORT}/" "./${P}-ready-to-go/docker-compose-${P}.yml"
-sed -i'' -e "s/{GDB_PORT}/${GDB_PORT}/" "./${P}-ready-to-go/docker-compose-${P}.yml"
-sed -i'' -e "s/{PREFIX}/${P}/" "./${P}-ready-to-go/fdp/application-${P}.yml"
-sed -i'' -e "s/{FDP_PORT}/${FDP_PORT}/" "./${P}-ready-to-go/fdp/application-${P}.yml"
-sed -i'' -e "s%{GUID}%${uri}%" "./${P}-ready-to-go/fdp/application-${P}.yml"
-sed -i'' -e "s%{GUID}%$uri%" "./${P}-ready-to-go/.env"
+cp -r ./Sextans-Sight ./${P}-Sextans-Sight
+cp ./${P}-Sextans-Sight/docker-compose-template.yml "./${P}-Sextans-Sight/docker-compose-${P}.yml"
+rm ./${P}-Sextans-Sight/docker-compose-template.yml
+cp ./${P}-Sextans-Sight/fdp/application-template.yml "./${P}-Sextans-Sight/fdp/application-${P}.yml"
+rm ./${P}-Sextans-Sight/fdp/application-template.yml
+cp ./${P}-Sextans-Sight/.env_template "./${P}-Sextans-Sight/.env"
+sed -i'' -e "s/{PREFIX}/${P}/" "./${P}-Sextans-Sight/docker-compose-${P}.yml"
+sed -i'' -e "s/{FDP_PORT}/${FDP_PORT}/" "./${P}-Sextans-Sight/docker-compose-${P}.yml"
+sed -i'' -e "s/{GDB_PORT}/${GDB_PORT}/" "./${P}-Sextans-Sight/docker-compose-${P}.yml"
+sed -i'' -e "s/{PREFIX}/${P}/" "./${P}-Sextans-Sight/fdp/application-${P}.yml"
+sed -i'' -e "s/{FDP_PORT}/${FDP_PORT}/" "./${P}-Sextans-Sight/fdp/application-${P}.yml"
+sed -i'' -e "s%{GUID}%${uri}%" "./${P}-Sextans-Sight/fdp/application-${P}.yml"
+sed -i'' -e "s%{GUID}%$uri%" "./${P}-Sextans-Sight/.env"
 
 echo ""
 echo ""
@@ -154,19 +158,19 @@ if [ $production = "true" ]; then
 fi
 
 sleep 600
-docker-compose -f "${CWD}/metadata/docker-compose-${P}.yml" down
-docker-compose -f "${CWD}/bootstrap/docker-compose-${P}.yml" down
-docker-compose -f "${CWD}/metadata/docker-compose-${P}.yml" rm -s -f
-docker-compose -f "${CWD}/bootstrap/docker-compose-${P}.yml" rm -s -f
+docker compose -f "${CWD}/metadata/docker-compose-${P}.yml" down
+docker compose -f "${CWD}/bootstrap/docker-compose-${P}.yml" down
+docker compose -f "${CWD}/metadata/docker-compose-${P}.yml" rm -s -f
+docker compose -f "${CWD}/bootstrap/docker-compose-${P}.yml" rm -s -f
 docker network rm bootstrap_default bootstrap_graphdb_net
 docker rmi -f bootstrap_graph_db_repo_manager:latest
 
-rm "${CWD}/metadata/docker-compose-${P}.yml"
+rm "${CWD}/config/docker-compose-${P}.yml"
 rm "${CWD}/bootstrap/docker-compose-${P}.yml"
-rm "${CWD}/metadata/fdp/application-${P}.yml"
+rm "${CWD}/config/fdp/application-${P}.yml"
 
 echo ""
-echo -e "${GREEN}Shutdown Complete.  Please now move into the ${NC} ./Sextans-Sight/ ${GREEN} folder where the full version of the docker-compose-{P}.yml file lives."
+echo -e "${GREEN}Shutdown Complete.  Please now move into the ${NC} ./${P}-Sextans-Sight/ ${GREEN} folder where the full version of the docker-compose-{P}.yml file lives."
 echo ""
 echo -e "${GREEN}To start your full Sextans Sight server, cd to that folder (or move it elsewhere) and and type:  "
 echo -e "docker-compose -f docker-compose-${P}.yml up -d ${NC}"

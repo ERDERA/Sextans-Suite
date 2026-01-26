@@ -1,42 +1,7 @@
-version: "3"
 services:
 
-
-  fdp:
-    image: {FDP}
-    restart: always
-    hostname: fdp
-    volumes:
-      - ./fdp/application-{PREFIX}.yml:/fdp/application.yml:ro
-    depends_on:
-      - mongo
-      - graphdb
-    networks:
-      - {PREFIX}-default
-
-
-  # FAIR Data Point client
-  fdp_client:
-    image: {FDPC}
-    hostname: fdpclient
-    restart: always
-    environment:
-      FDP_HOST: fdp
-    volumes:
-      - ./fdp/variables.scss:/src/scss/custom/_variables.scss:ro
-      - ./fdp/assets:/usr/share/nginx/html/assets:ro
-      - ./fdp/favicon.ico:/usr/share/nginx/html/favicon.ico:ro
-    depends_on:
-      - fdp
-    ports:
-      - {FDP_PORT}:80  # You should/must close this port, if you are using hitch
-    command: ./start.sh 
-    networks:
-      - {PREFIX}-default
-
-
   graphdb:
-    image: {GDB}
+    image: fairdatasystems/gdb:2026-01-26
     restart: always
     hostname: graphdb
     ports:
@@ -47,19 +12,8 @@ services:
       - {PREFIX}-default
 
       
-  # Mongo for FDP server    
-  mongo:
-    image: {MDB}
-    hostname: mongo
-    restart: always
-    volumes:
-      - {PREFIX}-mongo-data:/data/db
-      - {PREFIX}-mongo-init:/docker-entrypoint-initdb.d/
-    networks:
-      - {PREFIX}-default
-
   cde-box-daemon:
-    image:  {CDEB}    # to use the CARE-SM models with teh care-sm-toolkit
+    image:  fairdatasystems/cdeb:2026-01-26    # to use the CARE-SM models with teh care-sm-toolkit
     environment:
       GraphDB_User: ${GraphDB_User}
       GraphDB_Pass: ${GraphDB_Pass}
@@ -76,7 +30,7 @@ services:
       - {PREFIX}-default
 
   caresm:
-    image: {CARE}
+    image: fairdatasystems/care:2026-01-26
     hostname: caresm
     volumes:
       - ./data:/code/data
@@ -84,7 +38,7 @@ services:
       - {PREFIX}-default
 
   yarrrml-rdfizer:
-    image: {YRDF}
+    image: fairdatasystems/yrml:2026-01-26
     hostname: yarrrml-rdfizer
     environment:
       # (nquads (default), trig, trix, jsonld, hdt, turtle)
@@ -97,7 +51,7 @@ services:
       - {PREFIX}-default
 
   beacon_count:
-    image: {BEACON}
+    image: fairdatasystems/beacon:2026-01-26
     hostname: beacon_count
     restart: always
     ports:

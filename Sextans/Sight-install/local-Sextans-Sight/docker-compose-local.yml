@@ -3,21 +3,21 @@ services:
 
 
   fdp:
-    image: {FDP}
+    image: fairdatasystems/fdp:2025-09-08
     restart: always
     hostname: fdp
     volumes:
-      - ./fdp/application-{PREFIX}.yml:/fdp/application.yml:ro
+      - ./fdp/application-local.yml:/fdp/application.yml:ro
     depends_on:
       - mongo
       - graphdb
     networks:
-      - {PREFIX}-default
+      - local-default
 
 
   # FAIR Data Point client
   fdp_client:
-    image: {FDPC}
+    image: fairdatasystems/fdpclient:2025-09-08
     hostname: fdpclient
     restart: always
     environment:
@@ -29,45 +29,45 @@ services:
     depends_on:
       - fdp
     ports:
-      - {FDP_PORT}:80  # You should/must close this port, if you are using hitch
+      - 7890:80  # You should/must close this port, if you are using hitch
     command: ./start.sh 
     networks:
-      - {PREFIX}-default
+      - local-default
 
 
   graphdb:
-    image: {GDB}
+    image: fairdatasystems/gdb:2025-09-08
     restart: always
     hostname: graphdb
     ports:
-      - 127.0.0.1:{GDB_PORT}:7200
+      - 127.0.0.1:7891:7200
     volumes:
-      - {PREFIX}-graphdb:/opt/graphdb/home
+      - local-graphdb:/opt/graphdb/home
     networks:
-      - {PREFIX}-default
+      - local-default
 
       
   # Mongo for FDP server    
   mongo:
-    image: {MDB}
+    image: fairdatasystems/mdb:2025-09-08
     hostname: mongo
     restart: always
     volumes:
-      - {PREFIX}-mongo-data:/data/db
-      - {PREFIX}-mongo-init:/docker-entrypoint-initdb.d/
+      - local-mongo-data:/data/db
+      - local-mongo-init:/docker-entrypoint-initdb.d/
     networks:
-      - {PREFIX}-default
+      - local-default
 
 
 volumes:
-  {PREFIX}-graphdb:
+  local-graphdb:
     external: true
-  {PREFIX}-mongo-data:
+  local-mongo-data:
     external: true
-  {PREFIX}-mongo-init:
+  local-mongo-init:
     external: true
-  {PREFIX}-fdp-server:
+  local-fdp-server:
     external: true
 
 networks:
-  {PREFIX}-default:
+  local-default:

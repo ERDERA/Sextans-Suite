@@ -1,7 +1,9 @@
 timestamp=$(date +"%Y-%m-%d")
 
+rm -rf ./secury_scan_output/*.json
 
-image="ontotext/graphdb:10.8.0"
+
+image="ontotext/graphdb:10.8.2"
 name="gdb"
 outputfile=("./security_scan_output/scanresults_${name}_${timestamp}.json")
 docker run -d --name ${name} ${image}
@@ -226,16 +228,27 @@ BEACON="fairdatasystems/${name}:${timestamp}"
 trivy image --scanners vuln  --format json  --severity CRITICAL,HIGH  --timeout 1800s fairdatasystems/${name}:${timestamp} > ${outputfile}
 echo "END"
 
-cp docker-compose-template-template.yml docker-compose-template-tmp.yml
-sed -i'' -e "s!{FDP}!${FDP}!" "docker-compose-template-tmp.yml"
-sed -i'' -e "s!{FDPC}!${FDPC}!" "docker-compose-template-tmp.yml"
-sed -i'' -e "s!{GDB}!${GDB}!" "docker-compose-template-tmp.yml"
-sed -i'' -e "s!{MDB}!${MDB}!" "docker-compose-template-tmp.yml"
-sed -i'' -e "s!{YRDF}!${YRDF}!" "docker-compose-template-tmp.yml"
-sed -i'' -e "s!{BEACON}!${BEACON}!" "docker-compose-template-tmp.yml"
-sed -i'' -e "s!{CDEB}!${CDEB}!" "docker-compose-template-tmp.yml"
-sed -i'' -e "s!{CARE}!${CARE}!" "docker-compose-template-tmp.yml"
+cp sight-docker-compose-template-template.yml sight-docker-compose-template-tmp.yml
+cp fix-docker-compose-template-template.yml fix-docker-compose-template-tmp.yml
+sed -i'' -e "s!{FDP}!${FDP}!" "sight-docker-compose-template-tmp.yml"
+sed -i'' -e "s!{FDPC}!${FDPC}!" "sight-docker-compose-template-tmp.yml"
+sed -i'' -e "s!{GDB}!${GDB}!" "sight-docker-compose-template-tmp.yml"
+sed -i'' -e "s!{MDB}!${MDB}!" "sight-docker-compose-template-tmp.yml"
+sed -i'' -e "s!{YRDF}!${YRDF}!" "sight-docker-compose-template-tmp.yml"
+sed -i'' -e "s!{BEACON}!${BEACON}!" "sight-docker-compose-template-tmp.yml"
+sed -i'' -e "s!{CDEB}!${CDEB}!" "sight-docker-compose-template-tmp.yml"
+sed -i'' -e "s!{CARE}!${CARE}!" "sight-docker-compose-template-tmp.yml"
 
-mv docker-compose-template-tmp.yml ./FAIR-ready-to-go/docker-compose-template.yml
+sed -i'' -e "s!{FDP}!${FDP}!" "fix-docker-compose-template-tmp.yml"
+sed -i'' -e "s!{FDPC}!${FDPC}!" "fix-docker-compose-template-tmp.yml"
+sed -i'' -e "s!{GDB}!${GDB}!" "fix-docker-compose-template-tmp.yml"
+sed -i'' -e "s!{MDB}!${MDB}!" "fix-docker-compose-template-tmp.yml"
+sed -i'' -e "s!{YRDF}!${YRDF}!" "fix-docker-compose-template-tmp.yml"
+sed -i'' -e "s!{BEACON}!${BEACON}!" "fix-docker-compose-template-tmp.yml"
+sed -i'' -e "s!{CDEB}!${CDEB}!" "fix-docker-compose-template-tmp.yml"
+sed -i'' -e "s!{CARE}!${CARE}!" "fix-docker-compose-template-tmp.yml"
+
+mv fix-docker-compose-template-tmp.yml ../Fix-install/docker-compose-template.yml
+mv sight-docker-compose-template-tmp.yml ../Sight-install/docker-compose-template.yml
 
 ruby parse-security-scans.rb ./security_scan_output/*.json

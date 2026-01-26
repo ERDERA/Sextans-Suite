@@ -1,4 +1,3 @@
-version: '3'
 
 services:
   graphdb:
@@ -8,11 +7,11 @@ services:
     ports:
       - 7200:7200
     volumes:
-      - {PREFIX}-graphdb:/opt/graphdb/home
+      - local-graphdb:/opt/graphdb/home
     networks:
       - graphdb_net
     
-  #  This service creates  `prefix-fdp` repository in graphdb	
+  #  This service creates  `[prefix]-sextans-sight` repository in graphdb	
   graph_db_repo_manager:
     build: ./graph-db-repo-manager
     depends_on:
@@ -21,12 +20,12 @@ services:
       - "GRAPH_DB_URL=http://graphdb:7200"
       - "GRAPH_DB_ADMIN_USERNAME=admin"
       - "GRAPH_DB_ADMIN_PASSWORD=root"
-      - FDP_PREFIX={PREFIX}
+      - FDP_PREFIX=local
     networks:
       - graphdb_net
 
 volumes:
-  {PREFIX}-graphdb:
+  local-graphdb:
     external: true
 
 networks:

@@ -4,44 +4,42 @@ require 'csv'
 def parse_trivy_json(output)
   # Parse Trivy JSON output and filter for CRITICAL and HIGH vulnerabilities.
   # Expects JSON with a 'Results' key containing an array of result objects.
-  begin
-    data = JSON.parse(output)
-    filtered_vulns = []
-    results = data['Results'] || []
-    unless data['Results']
-      return nil, 'JSON does not contain "Results" key. Ensure input is valid Trivy JSON output.'
+
+  data = JSON.parse(output)
+  filtered_vulns = []
+  results = data['Results'] || []
+  return nil, 'JSON does not contain "Results" key. Ensure input is valid Trivy JSON output.' unless data['Results']
+
+  results.each do |result|
+    next unless result['Vulnerabilities'] # Skip if no vulnerabilities
+
+    result['Vulnerabilities'].each do |vuln|
+      severity = vuln['Severity']&.upcase
+      next unless %w[CRITICAL HIGH].include?(severity)
+
+      filtered_vulns << {
+        'Target' => result['Target'] || 'Unknown',
+        'VulnerabilityID' => vuln['VulnerabilityID'] || 'N/A',
+        'PkgName' => vuln['PkgName'] || 'N/A',
+        'InstalledVersion' => vuln['InstalledVersion'] || 'N/A',
+        'FixedVersion' => vuln['FixedVersion'] || 'N/A',
+        'Severity' => severity,
+        'Title' => vuln['Title'] || 'N/A',
+        'PrimaryURL' => vuln['PrimaryURL'] || 'N/A'
+      }
     end
-    results.each do |result|
-      next unless result['Vulnerabilities'] # Skip if no vulnerabilities
-      result['Vulnerabilities'].each do |vuln|
-        severity = vuln['Severity']&.upcase
-        if %w[CRITICAL HIGH].include?(severity)
-          filtered_vulns << {
-            'Target' => result['Target'] || 'Unknown',
-            'VulnerabilityID' => vuln['VulnerabilityID'] || 'N/A',
-            'PkgName' => vuln['PkgName'] || 'N/A',
-            'InstalledVersion' => vuln['InstalledVersion'] || 'N/A',
-            'FixedVersion' => vuln['FixedVersion'] || 'N/A',
-            'Severity' => severity,
-            'Title' => vuln['Title'] || 'N/A',
-            'PrimaryURL' => vuln['PrimaryURL'] || 'N/A'
-          }
-        end
-      end
-    end
-    [filtered_vulns, nil]
-  rescue JSON::ParserError
-    [nil, 'Invalid JSON format. Ensure input is valid Trivy JSON output.']
   end
+  [filtered_vulns, nil]
+rescue JSON::ParserError
+  [nil, 'Invalid JSON format. Ensure input is valid Trivy JSON output.']
 end
 
 def write_csv_output(vulns, output_file)
   # Write filtered vulnerabilities to a CSV file for spreadsheet use.
-  if vulns.empty?
-    return "No CRITICAL or HIGH vulnerabilities found. No CSV file created for #{output_file}."
-  end
+  return "No CRITICAL or HIGH vulnerabilities found. No CSV file created for #{output_file}." if vulns.empty?
 
-  headers = ['Target', 'VulnerabilityID', 'Package', 'InstalledVersion', 'FixedVersion', 'Severity', 'Title', 'PrimaryURL']
+  headers = %w[Target VulnerabilityID Package InstalledVersion FixedVersion Severity Title
+               PrimaryURL]
   CSV.open(output_file, 'w') do |csv|
     csv << headers
     vulns.each do |vuln|
@@ -65,7 +63,7 @@ end
 
 # Check for valid input
 if ARGV.empty?
-  puts 'Usage: ruby trivy_parser.rb <trivy_output.json> [trivy_output2.json ...] or glob pattern (e.g., ./scans/*.json)'
+  puts 'Usage: ruby parse-security-scans.rb <trivy_output.json> [trivy_output2.json ...] or glob pattern (e.g., ./scans/*.json)'
   exit 1
 end
 
