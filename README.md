@@ -1,7 +1,8 @@
 
 <p align="center"> 
-  <img src="sextant.png"> 
+  <img src="sextant.png" width="200px"> 
 </p>
+
 # Sextans Suite
 
 Sextans Suite is software to support FAIR Metadata (Sextans Sight) and FAIR Data (Sextans Fix) authoring and publishing.
