@@ -1,4 +1,3 @@
-version: '3'
 
 services:  
   # FAIR Data Point server    
@@ -44,6 +43,8 @@ services:
       - {PREFIX}-mongo-init:/docker-entrypoint-initdb.d/
     networks:
       - default
+      - bootstrap_graphdb_net    
+
       
 # Define networks here
 networks:
