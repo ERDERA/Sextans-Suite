@@ -9,10 +9,10 @@ export COMPOSE_DOCKER_CLI_BUILD=0
 
 
 function ctrl_c() {
-        docker-compose -f "$CWD/bootstrap_fix/docker-compose-${P}.yml" down
-        docker-compose rm -f "$CWD/bootstrap_fix/docker-compose-${P}.yml" -s
-        docker network rm bootstrap_default bootstrap_graphdb_net
-        docker rmi -f bootstrap_graph_db_repo_manager:latest
+        docker compose -f "$CWD/bootstrap_fix/docker-compose-${P}.yml" down
+        docker compose rm -f "$CWD/bootstrap_fix/docker-compose-${P}.yml" -s
+        docker network rm bootstrap_fix_default bootstrap_graphdb_net
+        docker rmi -f bootstrap_fix_graph_db_repo_manager:latest
 
         rm "${CWD}/bootstrap/docker-compose-${P}.yml"
 
@@ -86,19 +86,19 @@ cd bootstrap_fix
 cp docker-compose-template.yml "docker-compose-${P}.yml"
 sed -i'' -e "s/{PREFIX}/${P}/" "docker-compose-${P}.yml"
 
-docker-compose -f "docker-compose-${P}.yml" up --build -d
+docker compose -f "docker-compose-${P}.yml" up --build -d
 sleep 120
 
 echo ""
 echo -e "${GREEN}Creating a Sextans Fix Production Server folder in ${NC} ./${P}-Sextans-Fix/"
 echo ""
 
-cd ../Sextans-Fix
+cd ..
 mkdir ./${P}-Sextans-Fix
-cp -r ./data ./${P}-Sextans-Fix/
+cp -r ./Sextans-Fix/data ./${P}-Sextans-Fix/
+cp ./Sextans-Fix/.env_template "./${P}-Sextans-Fix/.env"
 
 cp ./docker-compose-template.yml "./${P}-Sextans-Fix/docker-compose-${P}.yml"
-cp ./.env_template "./${P}-Sextans-Fix/.env"
 sed -i'' -e "s/{PREFIX}/${P}/" "./${P}-Sextans-Fix/docker-compose-${P}.yml"
 sed -i'' -e "s/{GDB_PORT}/${GDB_PORT}/" "./${P}-Sextans-Fix/docker-compose-${P}.yml"
 # sed -i'' -e "s/{BEACON_PORT}/${BEACON_PORT}/" "./${P}-Sextans-Fix/docker-compose-${P}.yml"
@@ -114,25 +114,16 @@ echo -e "${GREEN}Now doing post-install clean-up..."
 
 docker compose -f "${CWD}/bootstrap_fix/docker-compose-${P}.yml" down
 docker compose -f "${CWD}/bootstrap_fix/docker-compose-${P}.yml" rm -s -f
-docker network rm bootstrap_sight_default bootstrap_sight_graphdb_net
-docker rmi -f bootstrap_sight_graph_db_repo_manager:latest
-
-rm "${CWD}/bootstrap_sight/docker-compose-${P}.yml"
-
-echo ""
-echo -e "${GREEN}DONE!"
-echo ""
-
-
-docker-compose -f "${CWD}/bootstrap_fix/docker-compose-${P}.yml" down
-docker-compose -f "${CWD}/bootstrap_fix/docker-compose-${P}.yml" rm -s -f
 docker network rm bootstrap_fix_default bootstrap_fix_graphdb_net
-docker rmi -f bootstrap_fix_graph_db_repo_manager:latest
+docker rmi -f bootstrap_fix-graph_db_repo_manager:latest
 
 rm "${CWD}/bootstrap_fix/docker-compose-${P}.yml"
 
 echo ""
-echo -e "${GREEN}Shutdown Complete.  Please now move into the ${NC} ./${P}-Sextans-Fix/ ${GREEN} folder where the full version of the docker-compose-{P}.yml file lives."
+echo -e "${GREEN}DONE!"
+echo ""
+echo ""
+echo -e "Please now move into the ${NC} ./${P}-Sextans-Fix/ ${GREEN} folder where the full version of the docker-compose-{P}.yml file lives."
 echo ""
 echo -e "${GREEN}To start the SECURE ENVIRONMENT SEXTANS FIX DATA SERVER, cd to that folder (or move it elsewhere) and and type:  "
 echo -e "docker-compose -f docker-compose-${P}.yml up -d ${NC}"

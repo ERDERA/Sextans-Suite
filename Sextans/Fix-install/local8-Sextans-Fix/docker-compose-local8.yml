@@ -1,0 +1,86 @@
+services:
+
+  graphdb:
+    image: fairdatasystems/gdb:2026-01-26
+    restart: always
+    hostname: graphdb
+    ports:
+      - 127.0.0.1:8889:7200
+    volumes:
+      - local8-graphdb:/opt/graphdb/home
+    networks:
+      - local8-default
+
+      
+  cde-box-daemon:
+    image:  fairdatasystems/cdeb:2026-01-26    # to use the CARE-SM models with teh care-sm-toolkit
+    environment:
+      GraphDB_User: ${GraphDB_User}
+      GraphDB_Pass: ${GraphDB_Pass}
+      baseURI: ${baseURI}
+      GRAPHDB_REPONAME: ${GRAPHDB_REPONAME}
+    depends_on:
+      - caresm
+      - yarrrml-rdfizer
+    ports:
+      - 127.0.0.1:8888:4567
+    volumes:
+      - ./data:/data
+    networks:
+      - local8-default
+
+  caresm:
+    image: fairdatasystems/care:2026-01-26
+    hostname: caresm
+    volumes:
+      - ./data:/code/data
+    networks:
+      - local8-default
+
+  yarrrml-rdfizer:
+    image: fairdatasystems/yrml:2026-01-26
+    hostname: yarrrml-rdfizer
+    environment:
+      # (nquads (default), trig, trix, jsonld, hdt, turtle)
+      - SERIALIZATION=nquads
+#    ports:
+#      - "4567:4567"
+    volumes:
+      - ./data:/mnt/data
+    networks:
+      - local8-default
+
+  # beacon_count:
+  #   image: fairdatasystems/beacon:2026-01-26
+  #   hostname: beacon_count
+  #   restart: always
+  #   ports:
+  #     - "{BEACON_PORT}:8000"
+  #   environment:
+  #     - TRIPLESTORE_URL=${DATA_SPARQL_ENDPOINT}
+  #     - TRIPLESTORE_USERNAME=${GraphDB_User}
+  #     - TRIPLESTORE_PASSWORD=${GraphDB_Pass}
+  #     - FILTER_SEX=True
+  #     - FILTER_DISEASE=True
+  #     - FILTER_SYMPTOM=True
+  #     - FILTER_GENE_VARIANT=True
+  #     - FILTER_BIRTHYEAR=True
+  #     - FILTER_AGE_SYMPTOM_ONSET=True
+  #     - FILTER_AGE_DIAGNOSIS=True
+  #     - URL_SERVER=http://my.server.org/beaconAPI/  # DO NOT include the path e.g. /individuals
+  #   networks:
+  #     - local8-default
+
+
+volumes:
+  local8-graphdb:
+    external: true
+  local8-mongo-data:
+    external: true
+  local8-mongo-init:
+    external: true
+  local8-fdp-server:
+    external: true
+
+networks:
+  local8-default:

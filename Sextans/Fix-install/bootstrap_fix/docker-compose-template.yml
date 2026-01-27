@@ -1,8 +1,7 @@
-version: '3'
 
 services:
   graphdb:
-    image: ontotext/graphdb:10.8.0
+    image: fairdatasystems/gdb:2026-01-26
     restart: always
     hostname: graphdb
     ports:
