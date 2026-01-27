@@ -6,7 +6,7 @@ services:
     hostname: fdp
     restart: always
     volumes:
-      - ./fdp/application-{PREFIX}.yml:/fdp/application.yml:ro
+      - ./fdp/application-sextans1100.yml:/fdp/application.yml:ro
     depends_on:
       - mongo
     networks:
@@ -27,7 +27,7 @@ services:
     depends_on:
       - fdp
     ports:
-      - {FDP_PORT}:80
+      - 1100:80
     networks:
       - default
       - bootstrap_sight_graphdb_net   
@@ -39,8 +39,8 @@ services:
     image: mongo:7.0
     restart: always
     volumes:
-      - {PREFIX}-mongo-data:/data/db
-      - {PREFIX}-mongo-init:/docker-entrypoint-initdb.d/
+      - sextans1100-mongo-data:/data/db
+      - sextans1100-mongo-init:/docker-entrypoint-initdb.d/
     networks:
       - default
       - bootstrap_sight_graphdb_net    
@@ -52,8 +52,8 @@ networks:
     external: true
 
 volumes:
-  {PREFIX}-mongo-data:
+  sextans1100-mongo-data:
     external: true
-  {PREFIX}-mongo-init:
+  sextans1100-mongo-init:
     external: true
 

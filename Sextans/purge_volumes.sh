@@ -1,0 +1,1 @@
+docker volume ls -q | grep '^sextans' | xargs -r docker volume rm -f
