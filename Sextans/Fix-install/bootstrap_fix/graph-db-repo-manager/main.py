@@ -75,18 +75,10 @@ def secure_graphdb(graphdb_url):
 
 def main(graphdb_url):
     '''
-    Create cde repository in graph DB
+    Create sextans-fix repository in graph DB
     '''
-    repo_id = FDP_PREFIX + "-cde"
-    repo_description = "Repository to store CDEs RDF documents"
-    create_repository(graphdb_url, repo_id, repo_description)
-    print(repo_id + " Created")
-
-    '''
-    Create fdp repository in graph DB
-    '''
-    repo_id = FDP_PREFIX + "-fdp"
-    repo_description = "Repository to store FAIR Data Point's metadata RDF documents"
+    repo_id = FDP_PREFIX + "-sextans-fix"
+    repo_description = "Repository to store CARE-SM RDF Data"
     create_repository(graphdb_url, repo_id, repo_description)
     print(repo_id + " Created")
 

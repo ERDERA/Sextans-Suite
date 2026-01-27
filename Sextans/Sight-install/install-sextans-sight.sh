@@ -63,9 +63,9 @@ export TMPDIR=$HOME/tmp
 # PREFIX needed by the main.py script and docker composes
 export FDP_PREFIX=$P
 
-docker network rm bootstrap_default
-docker ps -a | egrep -oh "${P}-ready-to-go.*" | xargs docker rm
-docker rm -f  bootstrap_graphdb_1 config_fdp_1 config_fdp_client_1
+docker network rm bootstrap_sight__default
+docker ps -a | egrep -oh "${P}-Sextans.*" | xargs docker rm
+docker rm -f  bootstrap_sight_graphdb_1 config_fdp_1 config_fdp_client_1
 docker volume remove -f "${P}-graphdb ${P}-fdp-client-assets ${P}-fdp-client-css ${P}-fdp-client-scss ${P}-fdp-server ${P}-mongo-data ${P}-mongo-init"
 
 docker volume create "${P}-graphdb"
@@ -83,7 +83,7 @@ echo -e "Go make a nice cup of tea and then come back to check on progress"
 echo -e "${NC}"
 echo ""
 
-cd bootstrap
+cd bootstrap_sight
 cp docker-compose-template.yml "docker-compose-${P}.yml"
 sed -i'' -e "s/{PREFIX}/${P}/" "docker-compose-${P}.yml"
 docker compose -f "docker-compose-${P}.yml" down
@@ -142,14 +142,14 @@ echo -e "${GREEN}Installation Complete!"
 echo -e "${GREEN}Now doing post-install clean-up..."
 
 docker compose -f "${CWD}/config/docker-compose-${P}.yml" down
-docker compose -f "${CWD}/bootstrap/docker-compose-${P}.yml" down
+docker compose -f "${CWD}/bootstrap_sight/docker-compose-${P}.yml" down
 docker compose -f "${CWD}/config/docker-compose-${P}.yml" rm -s -f
-docker compose -f "${CWD}/bootstrap/docker-compose-${P}.yml" rm -s -f
-docker network rm bootstrap_default bootstrap_graphdb_net
-docker rmi -f bootstrap_graph_db_repo_manager:latest
+docker compose -f "${CWD}/bootstrap_sight/docker-compose-${P}.yml" rm -s -f
+docker network rm bootstrap_sight_default bootstrap_sight_graphdb_net
+docker rmi -f bootstrap_sight_graph_db_repo_manager:latest
 
 rm "${CWD}/config/docker-compose-${P}.yml"
-rm "${CWD}/bootstrap/docker-compose-${P}.yml"
+rm "${CWD}/bootstrap_sight/docker-compose-${P}.yml"
 rm "${CWD}/config/fdp/application-${P}.yml"
 
 echo ""
